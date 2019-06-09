@@ -6,6 +6,7 @@ export class Block {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.id = `${x}x${y}`; // added id variable
     this.colour = COLOURS[Math.floor(Math.random() * COLOURS.length)];
   }
 }
@@ -40,6 +41,7 @@ export class BlockGrid {
           blockEl = document.createElement("div");
 
         blockEl.id = id;
+        blockEl.innerHTML = id;
         blockEl.className = "block";
         blockEl.style.background = block.colour;
         blockEl.addEventListener("click", evt => this.blockClicked(evt, block));
@@ -51,7 +53,11 @@ export class BlockGrid {
   }
 
   blockClicked(e, block) {
-    console.log(e, block);
+    console.log("BLOCK:", block);
+
+    var columnDiv = document.getElementById(`col_${block.x}`);
+    var rowDiv = document.getElementById(`block_${block.id}`);
+    columnDiv.removeChild(rowDiv);
   }
 }
 
