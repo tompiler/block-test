@@ -106,16 +106,18 @@ export class BlockGrid {
       });
     }
 
-    // var columnDiv = document.getElementById(`col_${block.x}`);
-    // var rowDiv = document.getElementById(`block_${block.id}`);
-    // rowDiv.className += "-removed";
-    // // if (active) {
-    // setTimeout(
-    //   () => {
-    //     columnDiv.removeChild(rowDiv);
-    //   },
-    //   0
-    // );
+    adjacents.forEach(block => {
+      var columnDiv = document.getElementById(`col_${block.x}`);
+      var rowDiv = document.getElementById(`block_${block.id}`);
+      setTimeout(
+        (rowDiv, columnDiv) => {
+          columnDiv.removeChild(rowDiv);
+        },
+        0,
+        rowDiv,
+        columnDiv
+      );
+    });
 
     console.log("Adjacents:", adjacents);
   }
