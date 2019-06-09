@@ -6,7 +6,7 @@ export class Block {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.id = `${x}x${y}`;
+    this.id = `${x}x${y}`; // added id variable
     this.colour = COLOURS[Math.floor(Math.random() * COLOURS.length)];
   }
 }
@@ -41,7 +41,6 @@ export class BlockGrid {
           blockEl = document.createElement("div");
 
         blockEl.id = id;
-        blockEl.innerHTML = id;
         blockEl.className = "block";
         blockEl.style.background = block.colour;
         blockEl.addEventListener("click", evt => this.blockClicked(evt, block));
@@ -53,6 +52,8 @@ export class BlockGrid {
   }
 
   getBlock([x, y]) {
+    // returns a block object given an array
+    // of x and y coords
     return this.grid[x] &&
       this.grid[x].find(block => {
         return block.y === y;
@@ -62,16 +63,19 @@ export class BlockGrid {
   adjacentColour(block) {
     // given a block, return all adjacent blocks of the same colour
 
-    console.log("BLOCK:", block);
-    const { x, y, colour, id, active } = block;
+    const { x, y, colour, active } = block;
 
     const leftBlock = this.getBlock([x - 1, y]);
     const rightBlock = this.getBlock([x + 1, y]);
     const upBlock = this.getBlock([x, y + 1]);
     const downBlock = this.getBlock([x, y - 1]);
 
-    console.log(leftBlock, rightBlock, upBlock, downBlock);
-    const adjacents = [block];
+    const adjacents = [];
+
+    // 1. ensure that x is within 0-9 inc.
+    // 2. ensure that if the colour of the adjacent block is the
+    //    same colour as the 'target' block, add this to the array
+
     if (x - 1 >= 0 && leftBlock && leftBlock.colour === colour) {
       adjacents.push(leftBlock);
     }
@@ -84,21 +88,17 @@ export class BlockGrid {
     if (y + 1 < MAX_Y && upBlock && upBlock.colour === colour) {
       adjacents.push(upBlock);
     }
-    // console.log(...adjacents);
+
     return adjacents;
   }
 
   blockClicked(e, block) {
-    console.log("BLOCK:", block);
-    var adjacents = this.adjacentColour(block);
-    // var IDs = new Set(adjacents.map(d => d.id));
-    console.log("Adjacents:", adjacents);
+    var adjacents = [block];
+
     for (var i = 0; i < adjacents.length; i++) {
       var newAdjacents = this.adjacentColour(adjacents[i]);
-      // newAdjacents.map(d => d.id).forEach(d => IDs.add(d));
-      // var newIDs = newAdjacents.map(d => d.id);
-      // console.log("NewAdjacents:", newAdjacents);
       newAdjacents.forEach(d => {
+        // use array of string ids for uniqueness
         var IDs = adjacents.map(adjacent => adjacent.id);
         if (!IDs.includes(d.id)) {
           adjacents.push(d);
@@ -119,7 +119,20 @@ export class BlockGrid {
       );
     });
 
-    console.log("Adjacents:", adjacents);
+    adjacents.forEach(block => {
+      // remove block from grid if we have clicked it
+      this.grid[block.x].splice(block.y, 1);
+
+      // for each block above this block, subtract 1
+      // from the y value to account for the adjustment
+      // to position correctly in anticipation of subsequent
+      // click events
+      for (var j = block.y; j < MAX_Y; j++) {
+        if (this.grid[block.x][j] !== undefined) {
+          this.grid[block.x][j].y -= 1;
+        }
+      }
+    });
   }
 }
 
